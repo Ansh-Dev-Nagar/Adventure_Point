@@ -1,0 +1,36 @@
+<% layout('layouts/boilerplate') %>
+
+    <div class="row">
+        <h1 class="text-center">Edit AdventurePlace</h1> 
+        <div class="col-6 offset-3">
+            <form action="/adventureplaces/<%=adventureplace._id%>?_method=PUT" method="POST">
+             <div class="mb-3">
+                 <label class="form-label" for="title">Title</label>
+                 <input class="form-control" type="text" id="title" name="adventureplace[title]" value="<%=adventureplace.title%>">
+             </div>
+             <div class="mb-3">
+                <label class="form-label" for="location">Location</label>
+                <input class="form-control" type="text" id="location" name="adventureplace[location]" value="<%=adventureplace.location%>">
+             </div>
+             <div class="mb-3">
+                 <label class="form-label" for="image">Image Url</label>
+                 <input class="form-control" type="text" id="image" name="adventureplace[image]" value="<%=adventureplace.image%>">
+              </div>
+              <div class="mb-3">
+                 <label class="form-label" for="price"> AdventurePlace Price</label>
+                 <div class="input-group">
+                     <span class="input-group-text" id="price-label">INR</span>
+                     <input type="text" class="form-control" id="price" placeholder="0.00" aria-label="price" aria-describedby="price-label" name="adventureplace[price]" value="<%=adventureplace.price%>">
+                   </div>
+              </div>
+              <div class="mb-3">
+                 <label class="form-label" for="description">Description</label>
+                 <textarea class="form-control" type="text" id="description" name="adventureplace[description]"><%=adventureplace.description%></textarea>
+              </div>
+             <div class="mb-3">
+                 <button class="btn btn-info text-light">Update AdventurePlace</button>
+             </div>
+            </form>
+            <a href="/adventureplaces/<%= adventureplace._id %>">Back to AdventurePlace</a>
+        </div>
+     </div>

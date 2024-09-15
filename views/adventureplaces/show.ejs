@@ -1,0 +1,28 @@
+<% layout('layouts/boilerplate') %>
+
+    <div class="row">
+        <div class="col-6 offset-3">
+            <div class="card mb-3">
+                <img src="<%=adventureplace.image%>" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title"><%=adventureplace.title%></h5>
+                  <p class="card-text"><%=adventureplace.description%></p>
+                </div>
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item text-muted"><%=adventureplace.location%></li>
+                  <li class="list-group-item">Price : <%=adventureplace.price%> INR</li>
+                </ul>
+                <div class="card-body">
+                  <a href="/adventureplaces/<%= adventureplace._id%>/edit" class="card-link btn btn-info text-white">Edit</a>
+                  <form class="d-inline" action="/adventureplaces/<%=adventureplace._id%>?_method=DELETE" method ="POST">
+                    <button class="btn btn-danger">Delete</button>
+                </form>
+                </div>
+                <div class="card-footer text-muted">
+                    5 days ago
+                </div>
+              </div>
+        </div>
+    </div>
+
+    
