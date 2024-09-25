@@ -3,29 +3,43 @@
     <div class="row">
         <h1 class="text-center">Edit AdventurePlace</h1> 
         <div class="col-6 offset-3">
-            <form action="/adventureplaces/<%=adventureplace._id%>?_method=PUT" method="POST">
+            <form action="/adventureplaces/<%=adventureplace._id%>?_method=PUT" method="POST" novalidate class="validated-form">
              <div class="mb-3">
                  <label class="form-label" for="title">Title</label>
-                 <input class="form-control" type="text" id="title" name="adventureplace[title]" value="<%=adventureplace.title%>">
+                 <input class="form-control" type="text" id="title" name="adventureplace[title]" value="<%=adventureplace.title%>" required>
+                 <div class="valid-feedback">
+                        Looks good!
+                    </div>
              </div>
              <div class="mb-3">
                 <label class="form-label" for="location">Location</label>
-                <input class="form-control" type="text" id="location" name="adventureplace[location]" value="<%=adventureplace.location%>">
+                <input class="form-control" type="text" id="location" name="adventureplace[location]" value="<%=adventureplace.location%>" required>
+                <div class="valid-feedback">
+                        Looks good!
+                    </div>
              </div>
              <div class="mb-3">
                  <label class="form-label" for="image">Image Url</label>
-                 <input class="form-control" type="text" id="image" name="adventureplace[image]" value="<%=adventureplace.image%>">
+                 <input class="form-control" type="text" id="image" name="adventureplace[image]" value="<%=adventureplace.image%>" required>
+                 <div class="valid-feedback">
+                        Looks good!
+                    </div>
               </div>
               <div class="mb-3">
                  <label class="form-label" for="price"> AdventurePlace Price</label>
                  <div class="input-group">
                      <span class="input-group-text" id="price-label">INR</span>
-                     <input type="text" class="form-control" id="price" placeholder="0.00" aria-label="price" aria-describedby="price-label" name="adventureplace[price]" value="<%=adventureplace.price%>">
-                   </div>
+                     <input type="text" class="form-control" id="price" placeholder="0.00" aria-label="price" aria-describedby="price-label" name="adventureplace[price]" value="<%=adventureplace.price%>" required>
+                     <div class="valid-feedback">
+                        Looks good!
+                    </div>
               </div>
               <div class="mb-3">
                  <label class="form-label" for="description">Description</label>
-                 <textarea class="form-control" type="text" id="description" name="adventureplace[description]"><%=adventureplace.description%></textarea>
+                 <textarea class="form-control" type="text" id="description" name="adventureplace[description]" required><%=adventureplace.description%></textarea>
+                 <div class="valid-feedback">
+                        Looks good!
+                    </div>
               </div>
              <div class="mb-3">
                  <button class="btn btn-info text-light">Update AdventurePlace</button>
