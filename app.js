@@ -3,6 +3,7 @@ const express=require('express');
 const path = require('path');
 const mongoose = require ('mongoose');
 const ejsMate = require ('ejs-mate');
+const {adventureplaceSchema} = require ('./schemas.js');
 const catchAsync = require ('./utils/catchAsync');
 const ExpressError = require ('./utils/ExpressError');
 const methodOverride = require('method-override');
@@ -25,6 +26,17 @@ app.set('views',path.join(__dirname,'views'))
 app.use(express.urlencoded({extended: true}))
 app.use(methodOverride('_method'));
 
+const validateAdventureplace = (req, res, next) => {
+     const { error } = adventureplaceSchema.validate(req.body);
+  if(error) { 
+    const msg= error.details.map(el => el.message).join(',')
+    throw new ExpressError(msg, 400)
+  }
+  else{
+    next();
+  }
+}
+
 app.get('/',(req,res) => {
     res.render('home')
 });
@@ -39,8 +51,24 @@ app.get('/adventureplaces/new',(req,res) => {
     res.render('adventureplaces/new');
 })
 
-app.post('/adventureplaces', catchAsync(async(req, res,next) => { 
-    if(!req.body.adventureplace) throw new ExpressError('Invalid Adventureplace Data',400);
+
+app.post('/adventureplaces', validateAdventureplace, catchAsync(async(req, res,next) => { 
+   // if(!req.body.adventureplace) throw new ExpressError('Invalid Adventureplace Data',400);
+  const adventureplaceSchema = Joi.object({
+     adventureplace: Joi.object({
+        title: Joi.string().required(),
+        price: Joi.number().required().min(0),
+        image: Joi.string().required(),
+        location: Joi.string().required(),
+        description: Joi.string().required()
+     }).required()
+  })
+  const { error } = adventureplaceSchema.validate(req.body);
+  if(error)
+  {
+    const msg= error.details.map(el => el.message).join(',')
+    throw new ExpressError(error.details, 400)
+  }
   const adventureplace = new adventurePlace(req.body.adventureplace);
   await adventureplace.save();
   res.redirect(`/adventureplaces/${adventureplace._id}`)
@@ -56,7 +84,7 @@ app.get('/adventureplaces/:id/edit', catchAsync(async (req,res,) => {
      res.render('adventureplaces/edit',{ adventureplace });
  }));
 
- app.put('/adventureplaces/:id', catchAsync(async (req,res) => {
+ app.put('/adventureplaces/:id', validateAdventureplace, catchAsync(async (req,res) => {
      const { id }= req.params;
      const adventureplace = await adventurePlace.findByIdAndUpdate(id,{...req.body.adventureplace});
      res.redirect(`/adventureplaces/${adventureplace._id}`)
