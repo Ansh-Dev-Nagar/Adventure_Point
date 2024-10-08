@@ -3,11 +3,13 @@ const express=require('express');
 const path = require('path');
 const mongoose = require ('mongoose');
 const ejsMate = require ('ejs-mate');
-const {adventureplaceSchema} = require ('./schemas.js');
+const {adventureplaceSchema, reviewSchema} = require ('./schemas.js');
 const catchAsync = require ('./utils/catchAsync');
 const ExpressError = require ('./utils/ExpressError');
 const methodOverride = require('method-override');
 const adventurePlace = require ('./models/adventureplace');
+const Review = require ('./models/review');
+const Joi = require('joi');
 
 mongoose.connect('mongodb://localhost:27017/adventure-point');
 
@@ -35,6 +37,17 @@ const validateAdventureplace = (req, res, next) => {
   else{
     next();
   }
+}
+
+const validateReview = (req, res, next) => {
+    const {error} = reviewSchema.validate(req.body);
+    if(error) { 
+        const msg= error.details.map(el => el.message).join(',')
+        throw new ExpressError(msg, 400)
+      }
+      else{
+        next();
+      }
 }
 
 app.get('/',(req,res) => {
@@ -75,7 +88,7 @@ app.post('/adventureplaces', validateAdventureplace, catchAsync(async(req, res,n
 }))
 
 app.get('/adventureplaces/:id', catchAsync(async (req,res,) => {
-   const adventureplace = await adventurePlace.findById(req.params.id)
+   const adventureplace = await adventurePlace.findById(req.params.id).populate('reviews');
     res.render('adventureplaces/show',{ adventureplace });
 }));
 
@@ -95,6 +108,22 @@ app.get('/adventureplaces/:id/edit', catchAsync(async (req,res,) => {
     await adventurePlace.findByIdAndDelete(id);
     res.redirect('/adventureplaces');
  }));
+
+ app.post('/adventureplaces/:id/reviews',validateReview, catchAsync(async(req, res) => {
+    const adventureplace = await adventurePlace.findById(req.params.id);
+    const review = new Review(req.body.review);
+    adventureplace.reviews.push(review);
+    await review.save();
+    await adventureplace.save();
+    res.redirect(`/adventureplaces/${adventureplace._id}`);
+ }))
+
+ app.delete('/adventureplaces/:id/reviews/:reviewId',catchAsync(async(req, res) => {
+  const {id, reviewId} = req.params;
+  await adventurePlace.findByIdAndUpdate(id, {$pull: {reviews: reviewId}});
+  await Review.findByIdAndDelete(reviewId);
+  res.redirect(`/adventureplaces/${id}`);
+ }))
 
  app.all('*', (req,res,next) => {
     next(new ExpressError('Page Not Found',404))
