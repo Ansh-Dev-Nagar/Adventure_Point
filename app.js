@@ -3,13 +3,13 @@ const express=require('express');
 const path = require('path');
 const mongoose = require ('mongoose');
 const ejsMate = require ('ejs-mate');
-const {adventureplaceSchema, reviewSchema} = require ('./schemas.js');
-const catchAsync = require ('./utils/catchAsync');
+const session = require ('express-session');
+const flash = require ('connect-flash');
 const ExpressError = require ('./utils/ExpressError');
 const methodOverride = require('method-override');
-const adventurePlace = require ('./models/adventureplace');
-const Review = require ('./models/review');
-const Joi = require('joi');
+
+const adventureplaces = require ('./routes/adventureplaces');
+const reviews = require ('./routes/reviews');
 
 mongoose.connect('mongodb://localhost:27017/adventure-point');
 
@@ -27,103 +27,33 @@ app.set('views',path.join(__dirname,'views'))
 
 app.use(express.urlencoded({extended: true}))
 app.use(methodOverride('_method'));
+app.use(express.static(path.join(__dirname,'public')))
+const sessionConfig = {
+   secret: 'thisshouldbeabettersecret!',
+   resave: false,
+   saveUninitialized: true,
+   cookie: {
+        httpOnly: true,
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+        maxAge: 1000 * 60 * 60 * 24 * 7
+   } 
 
-const validateAdventureplace = (req, res, next) => {
-     const { error } = adventureplaceSchema.validate(req.body);
-  if(error) { 
-    const msg= error.details.map(el => el.message).join(',')
-    throw new ExpressError(msg, 400)
-  }
-  else{
-    next();
-  }
 }
+app.use(session(sessionConfig))
+app.use(flash());
 
-const validateReview = (req, res, next) => {
-    const {error} = reviewSchema.validate(req.body);
-    if(error) { 
-        const msg= error.details.map(el => el.message).join(',')
-        throw new ExpressError(msg, 400)
-      }
-      else{
-        next();
-      }
-}
+app.use((req, res, next) => {
+   res.locals.success = req.flash('success');
+   res.locals.error = req.flash('error');
+   next();
+})
+
+app.use('/adventureplaces',adventureplaces)
+app.use('/adventureplaces/:id/reviews',reviews)
 
 app.get('/',(req,res) => {
     res.render('home')
 });
-
-app.get('/adventureplaces', catchAsync(async(req,res) => {
-    const adventureplaces = await adventurePlace.find({});
-    res.render('adventureplaces/index',{adventureplaces})
-}));
-
-app.get('/adventureplaces/new',(req,res) => {
-
-    res.render('adventureplaces/new');
-})
-
-
-app.post('/adventureplaces', validateAdventureplace, catchAsync(async(req, res,next) => { 
-   // if(!req.body.adventureplace) throw new ExpressError('Invalid Adventureplace Data',400);
-  const adventureplaceSchema = Joi.object({
-     adventureplace: Joi.object({
-        title: Joi.string().required(),
-        price: Joi.number().required().min(0),
-        image: Joi.string().required(),
-        location: Joi.string().required(),
-        description: Joi.string().required()
-     }).required()
-  })
-  const { error } = adventureplaceSchema.validate(req.body);
-  if(error)
-  {
-    const msg= error.details.map(el => el.message).join(',')
-    throw new ExpressError(error.details, 400)
-  }
-  const adventureplace = new adventurePlace(req.body.adventureplace);
-  await adventureplace.save();
-  res.redirect(`/adventureplaces/${adventureplace._id}`)
-}))
-
-app.get('/adventureplaces/:id', catchAsync(async (req,res,) => {
-   const adventureplace = await adventurePlace.findById(req.params.id).populate('reviews');
-    res.render('adventureplaces/show',{ adventureplace });
-}));
-
-app.get('/adventureplaces/:id/edit', catchAsync(async (req,res,) => {
-    const adventureplace = await adventurePlace.findById(req.params.id)
-     res.render('adventureplaces/edit',{ adventureplace });
- }));
-
- app.put('/adventureplaces/:id', validateAdventureplace, catchAsync(async (req,res) => {
-     const { id }= req.params;
-     const adventureplace = await adventurePlace.findByIdAndUpdate(id,{...req.body.adventureplace});
-     res.redirect(`/adventureplaces/${adventureplace._id}`)
- }));
-
- app.delete('/adventureplaces/:id',catchAsync(async (req,res) => {
-    const { id } = req.params;
-    await adventurePlace.findByIdAndDelete(id);
-    res.redirect('/adventureplaces');
- }));
-
- app.post('/adventureplaces/:id/reviews',validateReview, catchAsync(async(req, res) => {
-    const adventureplace = await adventurePlace.findById(req.params.id);
-    const review = new Review(req.body.review);
-    adventureplace.reviews.push(review);
-    await review.save();
-    await adventureplace.save();
-    res.redirect(`/adventureplaces/${adventureplace._id}`);
- }))
-
- app.delete('/adventureplaces/:id/reviews/:reviewId',catchAsync(async(req, res) => {
-  const {id, reviewId} = req.params;
-  await adventurePlace.findByIdAndUpdate(id, {$pull: {reviews: reviewId}});
-  await Review.findByIdAndDelete(reviewId);
-  res.redirect(`/adventureplaces/${id}`);
- }))
 
  app.all('*', (req,res,next) => {
     next(new ExpressError('Page Not Found',404))
