@@ -1,4 +1,4 @@
-# Adventure_Point
+# Adventure_Point (ongoing)
 AdventurePoint aims to provide a comprehensive platform for travellers and adventure enthusiasts to discover and explore new destinations.
 
  The application will feature:
