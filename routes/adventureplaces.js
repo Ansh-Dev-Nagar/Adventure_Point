@@ -5,7 +5,7 @@ const ExpressError = require ('../utils/ExpressError');
 const adventurePlace = require ('../models/adventureplace');
 const {adventureplaceSchema, reviewSchema} = require ('../schemas.js');
 const Joi = require('joi');
-
+const {isLoggedIn} = require('../middleware');
 const validateAdventureplace = (req, res, next) => {
     const { error } = adventureplaceSchema.validate(req.body);
  if(error) { 
@@ -22,13 +22,12 @@ router.get('/', catchAsync(async(req,res) => {
     res.render('adventureplaces/index',{adventureplaces})
 }));
 
-router.get('/new',(req,res) => {
-
+router.get('/new',isLoggedIn, (req,res) => {
     res.render('adventureplaces/new');
 })
 
 
-router.post('/', validateAdventureplace, catchAsync(async(req, res,next) => { 
+router.post('/',isLoggedIn, validateAdventureplace, catchAsync(async(req, res,next) => { 
    // if(!req.body.adventureplace) throw new ExpressError('Invalid Adventureplace Data',400);
   const adventureplaceSchema = Joi.object({
      adventureplace: Joi.object({
@@ -60,7 +59,7 @@ router.get('/:id', catchAsync(async (req,res,) => {
    res.render('adventureplaces/show',{ adventureplace });
 }));
 
-router.get('/:id/edit', catchAsync(async (req,res,) => {
+router.get('/:id/edit',isLoggedIn, catchAsync(async (req,res,) => {
     const adventureplace = await adventurePlace.findById(req.params.id)
     if(!adventureplace){
         req.flash('error','cannot find adventureplace');
@@ -69,14 +68,14 @@ router.get('/:id/edit', catchAsync(async (req,res,) => {
      res.render('adventureplaces/edit',{ adventureplace });
  }));
 
- router.put('/:id', validateAdventureplace, catchAsync(async (req,res) => {
+ router.put('/:id',isLoggedIn, validateAdventureplace, catchAsync(async (req,res) => {
      const { id }= req.params;
      const adventureplace = await adventurePlace.findByIdAndUpdate(id,{...req.body.adventureplace});
      req.flash('success','Sucessfully updated adventureplace!!');
      res.redirect(`/adventureplaces/${adventureplace._id}`)
  }));
 
- router.delete('/:id',catchAsync(async (req,res) => {
+ router.delete('/:id',isLoggedIn,catchAsync(async (req,res) => {
     const { id } = req.params;
     await adventurePlace.findByIdAndDelete(id);
     req.flash('success','Sucessfully deleted adventureplace!!');
