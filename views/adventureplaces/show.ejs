@@ -10,20 +10,24 @@
                 </div>
                 <ul class="list-group list-group-flush">
                   <li class="list-group-item text-muted"><%=adventureplace.location%></li>
+                  <li class="list-group-item">Submitted by <%=adventureplace.author.username%></li>
                   <li class="list-group-item">Price : <%=adventureplace.price%> INR</li>
                 </ul>
+                <% if(currentUser && adventureplace.author.id === currentUser?.id) { %>
                 <div class="card-body">
                   <a href="/adventureplaces/<%= adventureplace._id%>/edit" class="card-link btn btn-info text-white">Edit</a>
                   <form class="d-inline" action="/adventureplaces/<%=adventureplace._id%>?_method=DELETE" method ="POST">
                     <button class="btn btn-danger">Delete</button>
                 </form>
                 </div>
+                <% } %>
                 <div class="card-footer text-muted">
                     5 days ago
                 </div>
               </div>
         </div>
         <div class="col-6">
+          <% if(currentUser) { %>
           <h2>Leave a Review</h2>
           <form action="/adventureplaces/<%=adventureplace._id%>/reviews" method="post" class="mb-3 validated-form" novalidate>
             <div class="mb-3">
@@ -39,14 +43,18 @@
             </div>
             <button class="btn btn-success" >Submit</button>
           </form>
+          <% } %>
           <% for(let review of adventureplace.reviews) { %>
           <div class="card">
             <div class="mb-3 card-body">
               <h5 class="card-title">Rating: <%= review.rating %></h5>
               <p class="card-text">Review: <%= review.body %></p>
+              <p class="card-text text-muted">By <%= review.author.username %></p>
+              <% if(currentUser && review.author.id === currentUser?.id) { %>
               <form action="/adventureplaces/<%=adventureplace._id%>/reviews/<%=review._id%>?_method=DELETE" method="POST">
                 <button class="btn btn-sm btn-danger">Delete</button>
               </form>
+              <% } %>
           </div>
         </div>
           <% } %>

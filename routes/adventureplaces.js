@@ -3,19 +3,10 @@ const router = express.Router();
 const catchAsync = require ('../utils/catchAsync');
 const ExpressError = require ('../utils/ExpressError');
 const adventurePlace = require ('../models/adventureplace');
-const {adventureplaceSchema, reviewSchema} = require ('../schemas.js');
 const Joi = require('joi');
-const {isLoggedIn} = require('../middleware');
-const validateAdventureplace = (req, res, next) => {
-    const { error } = adventureplaceSchema.validate(req.body);
- if(error) { 
-   const msg= error.details.map(el => el.message).join(',')
-   throw new ExpressError(msg, 400)
- }
- else{
-   next();
- }
-}
+const {isLoggedIn, isAuthor, validateAdventureplace} = require('../middleware');
+
+
 
 router.get('/', catchAsync(async(req,res) => {
     const adventureplaces = await adventurePlace.find({});
@@ -45,13 +36,19 @@ router.post('/',isLoggedIn, validateAdventureplace, catchAsync(async(req, res,ne
     throw new ExpressError(error.details, 400)
   }
   const adventureplace = new adventurePlace(req.body.adventureplace);
+  adventureplace.author = req.user._id;
   await adventureplace.save();
   req.flash('success','Sucessfully made a new adventureplace!!');
   res.redirect(`/adventureplaces/${adventureplace._id}`)
 }))
 
 router.get('/:id', catchAsync(async (req,res,) => {
-   const adventureplace = await adventurePlace.findById(req.params.id).populate('reviews');
+   const adventureplace = await adventurePlace.findById(req.params.id).populate({
+    path: 'reviews',
+    populate: {
+        path: 'author'
+    }
+   }).populate('author');
    if(!adventureplace){
     req.flash('error','cannot find adventureplace');
     return res.redirect('/adventureplaces');
@@ -59,8 +56,9 @@ router.get('/:id', catchAsync(async (req,res,) => {
    res.render('adventureplaces/show',{ adventureplace });
 }));
 
-router.get('/:id/edit',isLoggedIn, catchAsync(async (req,res,) => {
-    const adventureplace = await adventurePlace.findById(req.params.id)
+router.get('/:id/edit',isLoggedIn,isAuthor, catchAsync(async (req,res,) => {
+    const { id }= req.params;
+  const adventureplace = await adventurePlace.findById(id)
     if(!adventureplace){
         req.flash('error','cannot find adventureplace');
         return res.redirect('/adventureplaces');
@@ -68,14 +66,14 @@ router.get('/:id/edit',isLoggedIn, catchAsync(async (req,res,) => {
      res.render('adventureplaces/edit',{ adventureplace });
  }));
 
- router.put('/:id',isLoggedIn, validateAdventureplace, catchAsync(async (req,res) => {
+ router.put('/:id',isLoggedIn,isAuthor, validateAdventureplace, catchAsync(async (req,res) => {
      const { id }= req.params;
      const adventureplace = await adventurePlace.findByIdAndUpdate(id,{...req.body.adventureplace});
      req.flash('success','Sucessfully updated adventureplace!!');
      res.redirect(`/adventureplaces/${adventureplace._id}`)
  }));
 
- router.delete('/:id',isLoggedIn,catchAsync(async (req,res) => {
+ router.delete('/:id',isLoggedIn,isAuthor,catchAsync(async (req,res) => {
     const { id } = req.params;
     await adventurePlace.findByIdAndDelete(id);
     req.flash('success','Sucessfully deleted adventureplace!!');
