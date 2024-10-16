@@ -21,6 +21,7 @@ const seedDB = async () => {
         const random180 = Math.floor(Math.random() * Math.min(180, cities.length));
         const price = Math.floor(Math.random()*50)+10;
         const place = new adventurePlace({
+            author: '670e8937fc7583e4b096d1e5',
             location: `${cities[random180].city}, ${cities[random180].state}`,
             title: `${sample(descriptors)} ${sample(places)}`,
             image: 'https://picsum.photos/400?random=${Math.random()}',
