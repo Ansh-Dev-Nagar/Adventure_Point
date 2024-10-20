@@ -30,13 +30,14 @@ const seedDB = async () => {
                 price,
                 images: [
                     {
-                      url: 'https://res.cloudinary.com/drtqz3tn5/image/upload/v1729219828/AdventurePlace/ra2hkba7vgzjbaf18vsj.jpg',
-                      filename: 'AdventurePlace/ra2hkba7vgzjbaf18vsj'    
-                    },
-                    {
-                      url: 'https://res.cloudinary.com/drtqz3tn5/image/upload/v1729219830/AdventurePlace/h21uoty5am8wmd6m70pw.jpg',
-                      filename: 'AdventurePlace/h21uoty5am8wmd6m70pw'    
-                    }
+                        url: 'https://res.cloudinary.com/drtqz3tn5/image/upload/v1729446767/AdventurePlace/s7dyrmg5absqibyotqqu.jpg',
+                        filename: 'AdventurePlace/s7dyrmg5absqibyotqqu'          
+                      },
+                      {
+                        url: 'https://res.cloudinary.com/drtqz3tn5/image/upload/v1729446770/AdventurePlace/xwzgcdzfvjt0lfiy5ozv.jpg',
+                        filename: 'AdventurePlace/xwzgcdzfvjt0lfiy5ozv'
+                      }
+                    
                 ]
             });
             await place.save();

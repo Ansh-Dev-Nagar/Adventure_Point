@@ -35,7 +35,7 @@ module.exports.showAdventureplace = async (req, res) => {
         req.flash('error', 'Cannot find adventureplace');
         return res.redirect('/adventureplaces');
     }
-    //console.log(adventureplace);
+  //  console.log(adventureplace);
     res.render('adventureplaces/show', { adventureplace });
 }
 
