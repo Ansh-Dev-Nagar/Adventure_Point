@@ -2,8 +2,8 @@
 
     <div class="row">
         <h1 class="text-center">Edit AdventurePlace</h1> 
-        <div class="col-6 offset-3">
-            <form action="/adventureplaces/<%=adventureplace._id%>?_method=PUT" method="POST" novalidate class="validated-form">
+        <div class="col-md-8 offset-md-2">
+            <form action="/adventureplaces/<%=adventureplace._id%>?_method=PUT" method="POST" novalidate class="validated-form" enctype="multipart/form-data">
              <div class="mb-3">
                  <label class="form-label" for="title">Title</label>
                  <input class="form-control" type="text" id="title" name="adventureplace[title]" value="<%=adventureplace.title%>" required>
@@ -19,14 +19,7 @@
                     </div>
              </div>
              <div class="mb-3">
-                 <label class="form-label" for="image">Image Url</label>
-                 <input class="form-control" type="text" id="image" name="adventureplace[image]" value="<%=adventureplace.image%>" required>
-                 <div class="valid-feedback">
-                        Looks good!
-                    </div>
-              </div>
-              <div class="mb-3">
-                 <label class="form-label" for="price"> AdventurePlace Price</label>
+                 <label class="form-label" for="price">AdventurePlace Price</label>
                  <div class="input-group">
                      <span class="input-group-text" id="price-label">INR</span>
                      <input type="text" class="form-control" id="price" placeholder="0.00" aria-label="price" aria-describedby="price-label" name="adventureplace[price]" value="<%=adventureplace.price%>" required>
@@ -41,10 +34,34 @@
                         Looks good!
                     </div>
               </div>
-             <div class="mb-3">
-                 <button class="btn btn-info text-light">Update AdventurePlace</button>
+              <div class="mb-3">
+                <label class="form-label">Current Images</label>
+                <div class="row row-cols-1 row-cols-md-2 g-4">
+                    <% adventureplace.images.forEach(function(img, i) { %>
+                    <div class="col">
+                        <div class="card">
+                            <img src="<%=img.url%>" class="card-img-top" alt="Adventure Place Image">
+                            <div class="card-body">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="image-<%=i%>" name="deleteImages[]" value="<%=img.filename%>">
+                                    <label class="form-check-label" for="image-<%=i%>">
+                                        Delete this image
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% }) %>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="image" class="form-label">Add New Images</label>
+                <input class="form-control" type="file" id="image" name="image" multiple>
+              </div>
+              <div class="mb-3">
+                 <button class="btn btn-primary">Update AdventurePlace</button>
              </div>
             </form>
-            <a href="/adventureplaces/<%= adventureplace._id %>">Back to AdventurePlace</a>
+            <a href="/adventureplaces/<%= adventureplace._id %>" class="btn btn-secondary">Back to AdventurePlace</a>
         </div>
      </div>

@@ -16,15 +16,14 @@ module.exports.storeReturnTo = (req, res, next) => {
     }
     next();
 }
-module.exports.validateAdventureplace = (req,res,next) => {
+module.exports.validateAdventureplace = (req, res, next) => {
     const { error } = adventureplaceSchema.validate(req.body);
- if(error) { 
-   const msg= error.details.map(el => el.message).join(',')
-   throw new ExpressError(msg, 400)
- }
- else{
-   next();
- }
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',')
+        throw new ExpressError(msg, 400)
+    } else {
+        next();
+    }
 }
 module.exports.isAuthor = async(req,res,next) => {
   const { id }= req.params;
