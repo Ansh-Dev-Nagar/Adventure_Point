@@ -22,6 +22,7 @@ and other information about AdventurePoint below the AdventurePoint WebApp secti
 4. **Editing adventure place**:
 
    <img width="1440" alt="Screenshot 2024-10-21 at 7 41 28 AM" src="https://github.com/user-attachments/assets/fa744101-c4c2-4b20-995e-04a5ea8d62be">
+
    <img width="1440" alt="Screenshot 2024-10-21 at 7 41 38 AM" src="https://github.com/user-attachments/assets/1790f1cb-50e2-4996-a3d9-754298c76464">
 
 5. **Adding new AdventurePlace**:
@@ -66,6 +67,7 @@ This project demonstrates proficiency in full-stack web development, database ma
 - **Authentication**: Passport.js
 - **Image Upload**: Cloudinary, Multer
 - **Data Validation**: Joi
+- **Testing APIs**: Postman
 - **Other Libraries**: 
   - connect-flash for flash messages
   - method-override for HTTP verb support
